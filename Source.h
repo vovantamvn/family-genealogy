@@ -7,17 +7,16 @@ typedef struct Person
 {
 	int id;
 	int age;
+	bool gender;
 	string firstName;
 	string lastName;
 	
 	// Family
-	Person* sibling;
 	Person* mom;
 	Person* dad;
 	
 	// Function
 	Person();
-	void addSibling(Person* sib);
 	void addMom(Person* mom);
 	void addDad(Person* dad);
 	void show();
@@ -28,26 +27,9 @@ Person::Person()
 	age = 0;
 	firstName = "";
 	lastName = "";
-	sibling = NULL;
+	gender = true; // True is a man
 	mom = NULL;
 	dad = NULL;
-}
-
-void Person::addSibling(Person* sib)
-{
-	if (this->sibling == NULL) {
-		this->sibling = sib;
-		return;
-	}
-
-	Person* tSib = this->sibling;
-	while (tSib != NULL)
-	{
-		tSib = tSib->sibling;
-	}
-
-	// Add sibling
-	tSib = sib;
 }
 
 void Person::addMom(Person* mom)
