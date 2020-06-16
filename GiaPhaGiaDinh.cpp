@@ -18,7 +18,9 @@ void createIndexOfNode(Person* person, int index);
 int getSizeOfTree(Person* tree);
 Person* getAllPersonInTree();
 void addNodeInArray(Person* arr, int& index, Person* tree);
-void writeNodeInFile(ofstream& file, Person node);
+void writeNodeInFile(ofstream& file, Person node, bool isEndFile);
+Person** getAllPersonInFile();
+void addNodeToTree(Person* tree, Person* node);
 
 // Function
 void printTree(Person* current, int level);
@@ -60,8 +62,6 @@ Person* getPerson()
     getline(cin, ptr->firstName);
     cout << "Enter the last name: ";
     getline(cin, ptr->lastName);
-    //cout << "Enter the age: ";
-    //cin >> ptr->age;
     return ptr;
 }
 
@@ -202,16 +202,77 @@ void addNodeInArray(Person* arr, int& index, Person* tree)
     }
 }
 
-void writeNodeInFile(ofstream& file, Person node)
+void writeNodeInFile(ofstream& file, Person node, bool isEndFile)
 {
     file << node.id;
-    file << ",";
+    file << " ";
+    file << node.gender;
     file << node.firstName;
     file << ",";
     file << node.lastName;
-    file << ",";
-    file << node.gender;
-    file << '\n';
+    
+    if (!isEndFile)
+    {
+        file << '\n';
+    }
+}
+
+Person** getAllPersonInFile()
+{
+    Person** arr = new Person*[100];
+    ifstream file("data.txt");
+
+    for (int i = 0; i < 100; i++)
+    {
+        arr[i] = NULL;
+    }
+
+    while (!file.eof())
+    {
+        try
+        {
+            Person* p = new Person();
+            file >> p->id;
+            file >> p->gender;
+            getline(file, p->firstName, ',');
+            getline(file, p->lastName);
+            
+            // Store
+            arr[p->id] = p;
+        }
+        catch (const std::exception&)
+        {
+
+        }
+    }
+
+    return arr;
+}
+
+void addNodeToTree(Person* tree, Person* node)
+{
+    // Check father
+    if (2 * tree->id == node->id)
+    {
+        tree->addDad(node);
+        return;
+    }
+    // Check mother
+    if ((2 * tree->id) + 1 == node->id)
+    {
+        tree->addMom(node);
+        return;
+    }
+
+    if(tree->dad != NULL)
+    {
+        addNodeToTree(tree->dad, node);
+    }
+
+    if (tree->mom != NULL)
+    {
+        addNodeToTree(tree->mom, node);
+    }
 }
 
 void printTree(Person *current, int level)
@@ -287,7 +348,14 @@ void saveFile()
 
     // Write data
     for (int i = 0; i < length; i++) {
-        writeNodeInFile(file, persons[i]);
+        if (i != length - 1)
+        {
+            writeNodeInFile(file, persons[i], false);
+        }
+        else
+        {
+            writeNodeInFile(file, persons[i], true);
+        }
     }
     file.close();
     
@@ -297,8 +365,23 @@ void saveFile()
 
 void readFile()
 {
-    cout << "read file\n";
-    system("pause");
+    Person** arr = getAllPersonInFile();
+    if (arr[1] == NULL) {
+        cout << "No Data!\n";
+        system("pause");
+        return;
+    }
+
+    root = arr[1];
+    for (int i = 2; i < 100; i++) {
+        if (arr[i] != NULL)
+        {
+            addNodeToTree(root, arr[i]);
+        }
+    }
+
+    // Current point is root
+    point = root;
 }
 
 void goToDad()
