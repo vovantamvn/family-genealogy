@@ -19,6 +19,8 @@ int getSizeOfTree(Person* tree);
 Person* getAllPersonInTree();
 void addNodeInArray(Person* arr, int& index, Person* tree);
 void writeNodeInFile(ofstream& file, Person node);
+Person* getAllPersonInFile();
+Person& convertDataToPerson(string data);
 
 // Function
 void printTree(Person* current, int level);
@@ -212,6 +214,35 @@ void writeNodeInFile(ofstream& file, Person node)
     file << ",";
     file << node.gender;
     file << '\n';
+}
+
+Person* getAllPersonInFile()
+{
+    Person* arr = new Person[100];
+    ifstream file("data.txt");
+
+    while (!file.eof())
+    {
+        try
+        {
+            string line;
+            getline(file, line);
+            Person p = convertDataToPerson(line);
+            int index = p.id;
+            arr[index] = p;
+        }
+        catch (const std::exception&)
+        {
+
+        }
+    }
+
+    return arr;
+}
+
+Person& convertDataToPerson(string data)
+{
+    //3, TAM, ME, 0
 }
 
 void printTree(Person *current, int level)
