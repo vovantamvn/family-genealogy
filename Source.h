@@ -6,7 +6,6 @@ using namespace std;
 typedef struct Person
 {
 	int id;
-	int age;
 	bool gender;
 	string firstName;
 	string lastName;
@@ -19,12 +18,11 @@ typedef struct Person
 	Person();
 	void addMom(Person* mom);
 	void addDad(Person* dad);
-	void show();
 };
 
 Person::Person() 
 {
-	age = 0;
+	id = 0;
 	firstName = "";
 	lastName = "";
 	gender = true; // True is a man
@@ -40,15 +38,4 @@ void Person::addMom(Person* mom)
 void Person::addDad(Person* dad)
 {
 	this->dad = dad;
-}
-
-void Person::show()
-{
-	cout	<< "Person {FullName: " 
-			<< this->firstName 
-			<< " " 
-			<< this->lastName 
-			<< ", Age: "
-			<< this->age 
-			<< "}";
 }

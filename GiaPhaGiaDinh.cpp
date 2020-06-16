@@ -2,6 +2,7 @@
 //
 
 #include "Source.h";
+#include <fstream>
 
 Person* root = NULL;
 Person* point = NULL;
@@ -12,6 +13,12 @@ const char* WOMAN_GENERATIONS[10] = { "root", "mother", "granmother", "great-gra
 Person* getPerson();
 void initData();
 void mainMenu();
+void createIndexOfTree();
+void createIndexOfNode(Person* person, int index);
+int getSizeOfTree(Person* tree);
+Person* getAllPersonInTree();
+void addNodeInArray(Person* arr, int& index, Person* tree);
+void writeNodeInFile(ofstream& file, Person node);
 
 // Function
 void printTree(Person* current, int level);
@@ -137,6 +144,76 @@ void mainMenu()
     }
 }
 
+void createIndexOfTree()
+{
+    if (root == NULL) {
+        exit(1);
+    }
+
+    createIndexOfNode(root, 1);
+}
+
+void createIndexOfNode(Person* person, int index)
+{
+    person->id = index;
+
+    if (person->dad != NULL) 
+    {
+        createIndexOfNode(person->dad, 2 * index);
+    }
+
+    if(person->mom != NULL)
+    {
+        createIndexOfNode(person->mom, 2 * index + 1);
+    }
+}
+
+int getSizeOfTree(Person* tree)
+{
+    if (tree == NULL) {
+        return 0;
+    }
+
+    return 1 + getSizeOfTree(tree->dad) + getSizeOfTree(tree->mom);
+}
+
+Person* getAllPersonInTree()
+{
+    int length = getSizeOfTree(root);
+    Person* persons = new Person[length];
+    int index = 0;
+    addNodeInArray(persons, index, root);
+    return persons;
+}
+
+void addNodeInArray(Person* arr, int& index, Person* tree)
+{
+    arr[index] = *tree;
+    index++;
+    
+    if (tree->dad != NULL) 
+    {
+        addNodeInArray(arr, index, tree->dad);
+    }
+
+    if (tree->mom)
+    {
+        addNodeInArray(arr, index, tree->mom);
+    }
+}
+
+void writeNodeInFile(ofstream& file, Person node)
+{
+    file << node.id;
+    file << " ";
+    file << node.gender;
+    file << " ";
+    file << node.firstName;
+    file << ",";
+    file << node.lastName;
+    file << '\n';
+}
+
 void printTree(Person *current, int level)
 {
     if (level > 3) {
@@ -151,11 +228,11 @@ void printTree(Person *current, int level)
     if (current->gender) 
     {
         // Man
-        cout << "Full name: " << current->firstName << " " << current->lastName << " ( " << MAN_GENERATIONS[level] << ")\n";
+        cout << "Full name: " << current->firstName << " " << current->lastName << " (" << MAN_GENERATIONS[level] << ")\n";
     }
     else 
     {
-        cout << "Full name: " << current->firstName << " " << current->lastName << " ( " << WOMAN_GENERATIONS[level] << ")\n";
+        cout << "Full name: " << current->firstName << " " << current->lastName << " (" << WOMAN_GENERATIONS[level] << ")\n";
     }
 
     // Go to father
@@ -199,7 +276,22 @@ void addMom()
 
 void saveFile()
 {
-    cout << "Save file!\n";
+    createIndexOfTree();
+    // Create a array to store tree
+    Person* persons = getAllPersonInTree();
+    int length = getSizeOfTree(root);
+    
+    // Create file
+    ofstream file;
+    file.open("data.txt");
+
+    // Write data
+    for (int i = 0; i < length; i++) {
+        writeNodeInFile(file, persons[i]);
+    }
+    file.close();
+    
+    cout << "Save file success!\n";
     system("pause");
 }
 
